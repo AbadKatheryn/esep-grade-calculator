@@ -1,8 +1,9 @@
 package esepunittests
 
-//Changed to have 1 list
+//Added pass/fail bool
 type GradeCalculator struct {
 	allAssignments []Grade
+	passOrFail bool
 }
 
 type GradeType int
@@ -29,12 +30,14 @@ type Grade struct {
 	Type  GradeType
 }
 
-//One list named allAssignments holds the different types
+//Initialized with pass/fail bool
 func NewGradeCalculator() *GradeCalculator {
 	return &GradeCalculator{
 		allAssignments: make([]Grade, 0),
+		passOrFail: false,
 	}
 }
+
 
 func (gc *GradeCalculator) GetFinalGrade() string {
 	numericalGrade := gc.calculateNumericalGrade()
@@ -52,8 +55,20 @@ func (gc *GradeCalculator) GetFinalGrade() string {
 	return "F"
 }
 
+//Created a new final calculator for pass/fail ranking
+func (gc *GradeCalculator) GetFinalRanking() string {
+	numericalGrade := gc.calculateNumericalGrade()
+
+	//Returns true if passing grade
+	if numericalGrade >= 70 {
+		return "Pass"
+	}
+	return "Fail"
+}
+
+
+
 func (gc *GradeCalculator) AddGrade(name string, grade int, gradeType GradeType) {
-	//Each have the same 3 needs. They are made more generic
 	gc.allAssignments = append(gc.allAssignments, Grade{
 		Name:  name,
 		Grade: grade,
@@ -62,7 +77,6 @@ func (gc *GradeCalculator) AddGrade(name string, grade int, gradeType GradeType)
 }
 
 func (gc *GradeCalculator) calculateNumericalGrade() int {
-	//Made the specific assignment in allAssignment list
 	assignment_average := computeAverage(gc.allAssignments, Assignment)
 	exam_average := computeAverage(gc.allAssignments, Exam)
 	essay_average := computeAverage(gc.allAssignments, Essay)
@@ -76,7 +90,6 @@ func computeAverage(grades []Grade, t GradeType) int {
 	sum := 0
 	count := 0
 
-	//Looks through all the grades
 	for _, grade := range grades {
 		if grade.Type == t {
 			sum += grade.Grade

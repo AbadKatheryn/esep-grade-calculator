@@ -1,9 +1,8 @@
 package esepunittests
 
+//Changed to have 1 list
 type GradeCalculator struct {
-	assignments []Grade
-	exams       []Grade
-	essays      []Grade
+	allAssignments []Grade
 }
 
 type GradeType int
@@ -30,11 +29,10 @@ type Grade struct {
 	Type  GradeType
 }
 
+//One list named allAssignments holds the different types
 func NewGradeCalculator() *GradeCalculator {
 	return &GradeCalculator{
-		assignments: make([]Grade, 0),
-		exams:       make([]Grade, 0),
-		essays:      make([]Grade, 0),
+		allAssignments: make([]Grade, 0),
 	}
 }
 
@@ -55,46 +53,36 @@ func (gc *GradeCalculator) GetFinalGrade() string {
 }
 
 func (gc *GradeCalculator) AddGrade(name string, grade int, gradeType GradeType) {
-	switch gradeType {
-	case Assignment:
-		gc.assignments = append(gc.assignments, Grade{
-			Name:  name,
-			Grade: grade,
-			Type:  Assignment,
-		})
-	case Exam:
-		gc.exams = append(gc.exams, Grade{
-			Name:  name,
-			Grade: grade,
-			Type:  Exam,
-		})
-	case Essay:
-		gc.essays = append(gc.essays, Grade{
-			Name:  name,
-			Grade: grade,
-			Type:  Essay,
-		})
-	}
+	//Each have the same 3 needs. They are made more generic
+	gc.allAssignments = append(gc.allAssignments, Grade{
+		Name:  name,
+		Grade: grade,
+		Type:  gradeType,
+	})
 }
 
 func (gc *GradeCalculator) calculateNumericalGrade() int {
-	assignment_average := computeAverage(gc.assignments)
-	exam_average := computeAverage(gc.exams)
-	//Changed gc.exams to gc.essays - KA
-	essay_average := computeAverage(gc.essays)
+	//Made the specific assignment in allAssignment list
+	assignment_average := computeAverage(gc.allAssignments, Assignment)
+	exam_average := computeAverage(gc.allAssignments, Exam)
+	essay_average := computeAverage(gc.allAssignments, Essay)
 
 	weighted_grade := float64(assignment_average)*.5 + float64(exam_average)*.35 + float64(essay_average)*.15
 
 	return int(weighted_grade)
 }
 
-func computeAverage(grades []Grade) int {
+func computeAverage(grades []Grade, t GradeType) int {
 	sum := 0
+	count := 0
 
-	//Swapped the location for _ and grades. Fixed grade to be grade.Grade - KA
+	//Looks through all the grades
 	for _, grade := range grades {
-		sum += grade.Grade
+		if grade.Type == t {
+			sum += grade.Grade
+			count++
+		}
 	}
 
-	return sum / len(grades)
+	return sum / count
 }
